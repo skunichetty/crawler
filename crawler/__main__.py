@@ -1,10 +1,9 @@
-# web crawler
 import logging
 import pathlib
 
 import click
 
-from scraper.crawl import crawl
+from crawler.crawl import crawl
 
 logger = logging.getLogger(__name__)
 

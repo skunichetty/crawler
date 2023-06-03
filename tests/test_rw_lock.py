@@ -2,7 +2,7 @@ import threading
 import unittest
 from typing import List
 
-from scraper.rw_lock import RWLock
+from crawler.rw_lock import RWLock
 
 NUM_THREADS = 10
 NUM_ITERATIONS = 10000

@@ -10,8 +10,8 @@ import bs4
 import numpy as np
 import requests
 
-from scraper.storage import WebsiteStorage
-from scraper.utils import RegexPattern, normalize_url
+from crawler.storage import WebsiteStorage
+from crawler.utils import RegexPattern, normalize_url
 
 NUM_WORKERS = 10
 JOB_TIMEOUT_WAIT = 10

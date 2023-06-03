@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from threading import Thread
 
-from scraper.storage import WebsiteStorage
+from crawler.storage import WebsiteStorage
 
 
 class StructureGenTests(unittest.TestCase):

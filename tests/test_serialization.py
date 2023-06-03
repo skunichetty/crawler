@@ -3,8 +3,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scraper.storage import WebsiteStorage
-from scraper.website_node import WebsiteNodeDecoder, WebsiteNodeEncoder
+from crawler.storage import WebsiteStorage
+from crawler.website_node import WebsiteNodeDecoder, WebsiteNodeEncoder
 
 
 class StructureGenTests(unittest.TestCase):

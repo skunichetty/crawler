@@ -2,8 +2,8 @@ from json import JSONDecoder, JSONEncoder
 from pathlib import Path
 from typing import Any
 
-from scraper.rw_lock import RWLock
-from scraper.utils import NodeType
+from crawler.rw_lock import RWLock
+from crawler.utils import NodeType
 
 
 class WebsiteNode:

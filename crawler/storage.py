@@ -6,8 +6,8 @@ from json import dump, load
 from os import getcwd
 from typing import List, Union
 
-from scraper.utils import RegexPattern, NodeType, normalize_url
-from scraper.website_node import WebsiteNode, WebsiteNodeDecoder, WebsiteNodeEncoder
+from crawler.utils import RegexPattern, NodeType, normalize_url
+from crawler.website_node import WebsiteNode, WebsiteNodeDecoder, WebsiteNodeEncoder
 
 
 class WebsiteStorage:
