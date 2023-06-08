@@ -7,6 +7,7 @@ from os import getcwd
 from typing import List, Union
 
 from crawler.utils import RegexPattern, NodeType, normalize_url
+from crawler.url import URL
 from crawler.website_node import WebsiteNode, WebsiteNodeDecoder, WebsiteNodeEncoder
 
 
@@ -147,10 +148,11 @@ class WebsiteStorage:
                 print("  " * (node.level - 1), end="")
             print("┗━ " + node.url)
 
-    def insert(self, url: str, data: str):
+    def insert(self, url: URL, data: str):
         """Insert a webpage url into the tree structure."""
-        url = RegexPattern.TRAILING_SLASH.sub("", url)
-        if not RegexPattern.HTML.search(url):
-            url += "/index.html"
-        url = RegexPattern.BASE.sub("", url)
-        self.__insert(self.root, [""] + url.split("/"), 0, data)
+        url_string = str(url)
+        url_string = RegexPattern.TRAILING_SLASH.sub("", url_string)
+        if not RegexPattern.HTML.search(url_string):
+            url_string += "/index.html"
+        url_string = RegexPattern.BASE.sub("", url_string)
+        self.__insert(self.root, [""] + url_string.split("/"), 0, data)

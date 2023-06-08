@@ -11,6 +11,7 @@ import numpy as np
 import requests
 
 from crawler.storage import WebsiteStorage
+from crawler.url import URL, ResourceType
 from crawler.utils import RegexPattern, normalize_url
 
 NUM_WORKERS = 10
@@ -25,7 +26,7 @@ visited = set()
 visited_lock = Lock()
 
 
-def crawl_page(worker_id: int, url: str, storage: WebsiteStorage) -> bool:
+def crawl_page(worker_id: int, url: URL, storage: WebsiteStorage) -> bool:
     with visited_lock:
         if url in visited:
             return False
@@ -33,7 +34,7 @@ def crawl_page(worker_id: int, url: str, storage: WebsiteStorage) -> bool:
     with visited_lock:
         visited.add(url)
 
-    logger.info(f"Worker %d | Downloading %s...", worker_id, url)
+    logger.info(f"Worker %d | Downloading %s...", worker_id, str(url))
     if (webpage := download_webpage(worker_id, url)) is None:
         return False
 
@@ -62,9 +63,9 @@ def worker(worker_id: int, storage: WebsiteStorage) -> None:
             shutdown = True
 
 
-def download_webpage(worker_id: int, url: str) -> str:
+def download_webpage(worker_id: int, url: URL) -> str:
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers)
+    response = requests.get(str(url), headers)
     if response.status_code >= 400:
         logger.warn(
             "Worker %d | Request failed with error code %d, skipping",
@@ -75,24 +76,23 @@ def download_webpage(worker_id: int, url: str) -> str:
     return response.text
 
 
-def parse_links(content: str, prefix_url: str):
-    prefix_url = RegexPattern.STRIPBASE.sub("/", prefix_url)
+def parse_links(content: str, base: URL):
     parsed_content = bs4.BeautifulSoup(content, "html.parser")
     links = set([link.get("href") for link in parsed_content.find_all("a")])
     links.update(frame.get("src") for frame in parsed_content.find_all("frame"))
 
     filtered = []
     for link in links:
-        if not link:
+        url = URL(link)
+        if url.location not in ("", base.location):
             continue
-        if link.startswith(".."):
-            # ignore relative links
+        new_url = base.join(url)
+        if new_url.type == ResourceType.FILE and not RegexPattern.HTML.search(
+            str(new_url)
+        ):
             continue
-        if not RegexPattern.BASE.search(link):
-            if RegexPattern.HTML.search(link):
-                filtered.append(prefix_url + link)
-            if link.endswith("/"):
-                filtered.append(prefix_url + link)  # this is also a link to check out
+        filtered.append(new_url)
+    print(filtered)
     return list(set(filtered))
 
 
@@ -121,7 +121,7 @@ def crawl(url: str, storage_directory: pathlib.Path):
     webpath.mkdir(parents=True, exist_ok=True)
 
     storage = WebsiteStorage(storage_directory)
-    job_queue.put(url)
+    job_queue.put(URL(url))
     with ThreadPoolExecutor(NUM_WORKERS) as executor:
         for index in range(NUM_WORKERS):
             executor.submit(worker, index, storage)
